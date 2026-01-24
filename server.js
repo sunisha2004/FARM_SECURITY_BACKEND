@@ -12,6 +12,7 @@ import farmerRoutes from './src/routes/farmer.routes.js';
 import farmerZoneRoutes from './src/routes/farmer.zone.routes.js';
 import adminZoneRoutes from './src/routes/admin.zone.routes.js';
 import videoRoutes from './src/routes/video.routes.js';
+import alertRoutes from './src/routes/alert.routes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -34,6 +35,7 @@ app.use('/api/farmer', farmerRoutes);
 app.use('/api/farmer/zones', farmerZoneRoutes);
 app.use('/api/admin/zones', adminZoneRoutes);
 app.use('/api/videos', videoRoutes);
+app.use('/api/alerts', alertRoutes);
 
 app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'OK' });

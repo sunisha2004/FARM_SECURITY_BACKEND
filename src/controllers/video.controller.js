@@ -12,13 +12,15 @@ const uploadVideo = asyncHandler(async (req, res) => {
     throw new Error('No video file uploaded');
   }
 
-  const { title } = req.body;
+  const { title, zoneId, zoneName } = req.body;
   const fileUrl = `/${req.file.path.replace(/\\/g, '/')}`;
 
   const video = await Video.create({
     title: title || req.file.originalname,
     fileUrl,
     uploadedBy: req.user._id,
+    zoneId: zoneId || null,
+    zoneName: zoneName || null
   });
 
   res.status(201).json(video);

@@ -15,6 +15,15 @@ const videoSchema = mongoose.Schema(
       required: true,
       ref: 'User',
     },
+    zoneId: {
+       type: mongoose.Schema.Types.ObjectId,
+       ref: 'Zone',
+       required: false 
+    },
+    zoneName: {
+        type: String,
+        required: false
+    }
   },
   {
     timestamps: true,
