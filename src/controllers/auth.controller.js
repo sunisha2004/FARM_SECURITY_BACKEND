@@ -24,11 +24,17 @@ const registerUser = asyncHandler(async (req, res) => {
 
   // Create user
   // Force role to be 'farmer' always
+  let imagePath = '';
+  if(req.file) {
+      imagePath = '/uploads/' + req.file.filename;
+  }
+
   const user = await User.create({
     name,
     email,
     password,
     role: 'farmer',
+    image: imagePath    
   });
 
   if (user) {
@@ -37,6 +43,7 @@ const registerUser = asyncHandler(async (req, res) => {
       name: user.name,
       email: user.email,
       role: user.role,
+      image: user.image,
       message: 'User registered successfully',
     });
   } else {
@@ -65,6 +72,7 @@ const loginUser = asyncHandler(async (req, res) => {
       name: user.name,
       email: user.email,
       role: user.role,
+      image: user.image,
       token: generateToken(user._id),
     });
   } else {

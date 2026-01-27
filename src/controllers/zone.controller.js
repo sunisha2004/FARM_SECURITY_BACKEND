@@ -6,7 +6,7 @@ import Farm from '../models/Farm.js';
 // @route   POST /api/farmer/zones
 // @access  Private/Farmer
 const createZone = asyncHandler(async (req, res) => {
-  console.log('createZone called with body:', req.body);
+  // console.log('createZone called with body:', req.body);
   const { zoneName, description, riskLevel } = req.body;
 
   if (!zoneName) {
@@ -37,7 +37,7 @@ const createZone = asyncHandler(async (req, res) => {
 // @route   GET /api/farmer/zones
 // @access  Private/Farmer
 const getFarmerZones = asyncHandler(async (req, res) => {
-  console.log('getFarmerZones called for user:', req.user._id);
+  // console.log('getFarmerZones called for user:', req.user._id);
   const farm = await Farm.findOne({ owner: req.user._id });
 
   if (!farm) {

@@ -16,7 +16,11 @@ const updateMe = asyncHandler(async (req, res) => {
 
   if (user) {
     user.name = req.body.name || user.name;
-    // user.email = req.body.email || user.email; // Prevent email update for now
+    
+    // Handle image update if file is uploaded
+    if (req.file) {
+        user.image = '/uploads/' + req.file.filename;
+    }
     
     const updatedUser = await user.save();
 
@@ -25,6 +29,7 @@ const updateMe = asyncHandler(async (req, res) => {
       name: updatedUser.name,
       email: updatedUser.email,
       role: updatedUser.role,
+      image: updatedUser.image,
     });
   } else {
     res.status(404);

@@ -26,8 +26,8 @@ const alertSchema = mongoose.Schema(
     },
     severity: {
       type: String,
-      enum: ['LOW', 'HIGH'],
-      default: 'LOW',
+      enum: ['SAFE', 'WARNING', 'DANGEROUS', 'LOW', 'HIGH'], // kept LOW/HIGH for backward compat if needed, but prefer new ones
+      default: 'SAFE',
     },
     farmerId: {
       type: mongoose.Schema.Types.ObjectId,

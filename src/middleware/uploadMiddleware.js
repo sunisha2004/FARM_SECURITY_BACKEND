@@ -14,16 +14,17 @@ const storage = multer.diskStorage({
 });
 
 function checkFileType(file, cb) {
-  const filetypes = /mp4|mov|avi|mkv|webm/;
+  // Allowed ext
+  const filetypes = /jpeg|jpg|png|mp4|mov|avi|mkv|webm/;
+  // Check ext
   const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+  // Check mime
   const mimetype = filetypes.test(file.mimetype);
-
-  // console.log('Upload Check:', file.originalname, 'Ext:', extname, 'Mime:', file.mimetype);
 
   if (extname && mimetype) {
     return cb(null, true);
   } else {
-    cb('Error: Videos Only! (Invalid Type)');
+    cb('Error: Invalid File Type!');
   }
 }
 

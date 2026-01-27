@@ -15,9 +15,14 @@ const processDetection = asyncHandler(async (req, res) => {
     }
 
     // Dangerous animals list
-    const dangerousAnimals = ['boar', 'elephant', 'tiger', 'bear', 'leopard'];
-    const isDangerous = dangerousAnimals.includes(animalType.toLowerCase());
-    const severity = isDangerous ? 'HIGH' : 'LOW';
+    // Risk Classification
+    const dangerousAnimals = ['boar', 'elephant', 'tiger', 'bear', 'leopard', 'lion', 'wolf', 'crocodile'];
+    const warningAnimals = ['fox', 'monkey', 'unknown'];
+    const safeAnimals = ['cow', 'sheep', 'chicken', 'cat', 'dog', 'horse', 'bird', 'goat'];
+
+    let severity = 'SAFE'; 
+    if (dangerousAnimals.includes(animalType.toLowerCase())) severity = 'DANGEROUS';
+    else if (warningAnimals.includes(animalType.toLowerCase())) severity = 'WARNING';
 
     let alertZoneName = providedZoneName || 'Unknown Zone';
     let alertZoneId = zoneId || null;
@@ -41,9 +46,7 @@ const processDetection = asyncHandler(async (req, res) => {
         if (zone) alertZoneName = zone.zoneName;
     }
 
-    const message = isDangerous 
-        ? `⚠️ Dangerous animal (${animalType}) detected in ${alertZoneName}.`
-        : `A ${animalType} detected in ${alertZoneName} zone.`;
+    const message = `⚠️ A ${animalType} detected in ${alertZoneName} zone – ${severity}`;
 
     const alert = await Alert.create({
         message,
@@ -109,9 +112,73 @@ const deleteAlert = asyncHandler(async (req, res) => {
     res.json({ id: req.params.id, message: 'Alert removed' });
 });
 
+// @desc    Clear all alerts
+// @route   DELETE /api/alerts
+// @access  Private/Farmer
+const clearAllAlerts = asyncHandler(async (req, res) => {
+    await Alert.deleteMany({ farmerId: req.user._id });
+    res.json({ message: 'All alerts cleared' });
+});
+
+// @desc    Get dashboard statistics
+// @route   GET /api/alerts/stats
+// @access  Private/Farmer
+const getDashboardStats = asyncHandler(async (req, res) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // parallel queries for efficiency
+    const [todayAlerts, activeAlerts, dangerousAlerts, zonesCount] = await Promise.all([
+        Alert.find({ 
+            farmerId: req.user._id,
+            createdAt: { $gte: today }
+        }),
+        Alert.countDocuments({ farmerId: req.user._id, isRead: false }),
+        Alert.countDocuments({ farmerId: req.user._id, severity: 'DANGEROUS', isRead: false }),
+        Zone.countDocuments({ createdBy: req.user._id }) // assuming 'createdBy' links to farmer
+    ]);
+
+    // calculate 'Total animals detected today' from alerts? 
+    // Or is every alert a detection? Yes, processDetection creates an alert for every detection (subject to throttle).
+    // So todayAlerts.length is animals detected today.
+    
+    // Most frequent animal
+    const animalCounts = {};
+    todayAlerts.forEach(a => {
+        animalCounts[a.animalType] = (animalCounts[a.animalType] || 0) + 1;
+    });
+    
+    let mostFrequent = 'None';
+    let maxCount = 0;
+    Object.entries(animalCounts).forEach(([type, count]) => {
+        if(count > maxCount) {
+            maxCount = count;
+            mostFrequent = type;
+        }
+    });
+
+    // Last detected
+    const lastAlert = await Alert.findOne({ farmerId: req.user._id }).sort({ createdAt: -1 });
+
+    res.json({
+        totalAnimalsToday: todayAlerts.length,
+        totalActiveAlerts: activeAlerts,
+        totalDangerousAlerts: dangerousAlerts,
+        totalZones: zonesCount,
+        mostFrequentAnimal: mostFrequent,
+        lastDetected: lastAlert ? {
+            animal: lastAlert.animalType,
+            zone: lastAlert.zoneName,
+            time: lastAlert.createdAt
+        } : null
+    });
+});
+
 export {
     processDetection,
     getAlerts,
     markAlertRead,
-    deleteAlert
+    deleteAlert,
+    clearAllAlerts,
+    getDashboardStats
 };
