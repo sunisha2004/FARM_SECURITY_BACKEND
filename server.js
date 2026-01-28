@@ -14,6 +14,7 @@ import adminZoneRoutes from './src/routes/admin.zone.routes.js';
 import videoRoutes from './src/routes/video.routes.js';
 import alertRoutes from './src/routes/alert.routes.js';
 import userRoutes from './src/routes/user.routes.js';
+import galleryRoutes from './src/routes/gallery.routes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -38,6 +39,7 @@ app.use('/api/admin/zones', adminZoneRoutes);
 app.use('/api/videos', videoRoutes);
 app.use('/api/alerts', alertRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/gallery', galleryRoutes);
 
 app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'OK' });

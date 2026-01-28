@@ -7,19 +7,25 @@ import User from '../models/User.js';
 // @route   POST /api/auth/register
 // @access  Public
 const registerUser = asyncHandler(async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, phoneNumber } = req.body;
 
-  if (!name || !email || !password) {
+  if (!name || !email || !password || !phoneNumber) {
     res.status(400);
     throw new Error('Please add all fields');
   }
 
-  // Check if user exists
-  const userExists = await User.findOne({ email });
+  // Check if user exists (email or phone)
+  const userExists = await User.findOne({ 
+      $or: [{ email }, { phoneNumber }] 
+  });
 
   if (userExists) {
     res.status(400);
-    throw new Error('User already exists');
+    if (userExists.email === email) {
+        throw new Error('Email already exists');
+    } else {
+        throw new Error('Phone number already registered');
+    }
   }
 
   // Create user
@@ -33,6 +39,7 @@ const registerUser = asyncHandler(async (req, res) => {
     name,
     email,
     password,
+    phoneNumber,
     role: 'farmer',
     image: imagePath    
   });
@@ -42,6 +49,7 @@ const registerUser = asyncHandler(async (req, res) => {
       _id: user.id,
       name: user.name,
       email: user.email,
+      phoneNumber: user.phoneNumber,
       role: user.role,
       image: user.image,
       message: 'User registered successfully',
@@ -71,6 +79,7 @@ const loginUser = asyncHandler(async (req, res) => {
       _id: user.id,
       name: user.name,
       email: user.email,
+      phoneNumber: user.phoneNumber,
       role: user.role,
       image: user.image,
       token: generateToken(user._id),

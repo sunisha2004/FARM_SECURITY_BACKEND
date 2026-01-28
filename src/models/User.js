@@ -28,6 +28,12 @@ const userSchema = mongoose.Schema(
     image: {
         type: String,
         default: ''
+    },
+    phoneNumber: {
+      type: String,
+      required: [true, 'Please add a phone number'],
+      unique: true,
+      trim: true,
     }
   },
   {
