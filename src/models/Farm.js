@@ -8,7 +8,6 @@ const farmSchema = mongoose.Schema(
     },
     location: {
       type: String,
-      required: [true, 'Please add a location'],
     },
     owner: {
       type: mongoose.Schema.Types.ObjectId,
