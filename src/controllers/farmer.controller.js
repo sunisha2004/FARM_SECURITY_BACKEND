@@ -7,7 +7,7 @@ import Farm from '../models/Farm.js';
 // @route   POST /api/farmer/farm
 // @access  Private/Farmer
 const createFarm = asyncHandler(async (req, res) => {
-  const { farmName, location } = req.body;
+  const { farmName, location, coordinates } = req.body;
 
   const farmExists = await Farm.findOne({ owner: req.user._id });
 
@@ -19,6 +19,7 @@ const createFarm = asyncHandler(async (req, res) => {
   const farm = await Farm.create({
     farmName,
     location,
+    coordinates,
     owner: req.user._id,
   });
 
@@ -48,6 +49,9 @@ const updateFarm = asyncHandler(async (req, res) => {
   if (farm) {
     farm.farmName = req.body.farmName || farm.farmName;
     farm.location = req.body.location || farm.location;
+    if (req.body.coordinates) {
+        farm.coordinates = req.body.coordinates;
+    }
     
     // Add camera feeds if provided (handled via separate endpoint usually, but allowing update here too if array provided)
     if(req.body.cameraFeeds) {

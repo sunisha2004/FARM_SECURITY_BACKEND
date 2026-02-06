@@ -9,6 +9,10 @@ const farmSchema = mongoose.Schema(
     location: {
       type: String,
     },
+    coordinates: {
+      lat: Number,
+      lng: Number
+    },
     owner: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
