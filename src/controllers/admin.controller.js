@@ -32,11 +32,15 @@ const getFarmerById = asyncHandler(async (req, res) => {
 // @route   PATCH /api/admin/farmers/:id/status
 // @access  Private/Admin
 const updateFarmerStatus = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.params.id);
+  const { isActive } = req.body;
+  
+  const updatedUser = await User.findByIdAndUpdate(
+    req.params.id,
+    { isActive },
+    { new: true, runValidators: false }
+  ).select('-password');
 
-  if (user && user.role === 'farmer') {
-    user.isActive = req.body.isActive;
-    const updatedUser = await user.save();
+  if (updatedUser) {
     res.json({
       _id: updatedUser._id,
       name: updatedUser.name,
